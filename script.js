@@ -49,16 +49,26 @@ document.addEventListener("keydown", e => {
 document.addEventListener("keyup", e => keys[e.key]=false);
 startScreen.addEventListener("touchstart", startGame);
 
-/* Fire spawn */
+/* Fire spawn - avoid spawning on player */
 function spawnFire(size=60){
+    let x, y;
+    const shipSize = Math.min(canvas.width, canvas.height)/8;
+    let safeDistance = 120 + shipSize; // safe buffer around ship
+    do {
+        x = Math.random() * canvas.width;
+        y = Math.random() * canvas.height;
+    } while (Math.sqrt((x-ship.x)**2 + (y-ship.y)**2) < safeDistance);
+
     fires.push({
-        x: Math.random()*canvas.width,
-        y: Math.random()*canvas.height,
+        x: x,
+        y: y,
         size: size,
         dx: (Math.random()-0.5)*2,
         dy: (Math.random()-0.5)*2
     });
 }
+
+// initial fires
 for(let i=0;i<3;i++) spawnFire();
 let fireTimer=0;
 
@@ -161,12 +171,13 @@ function draw(){
         ctx.font="60px monospace";
         ctx.fillText("GAME OVER",canvas.width/2-200,canvas.height/2);
         ctx.font="28px monospace";
-        ctx.fillText("Press SPACE or tap screen to restart",canvas.width/2-180,canvas.height/2+50);
+        ctx.fillText("Tap or click anywhere to restart",canvas.width/2-180,canvas.height/2+50);
     }
 }
 
 /* Reset */
 function resetGame(){
+    const shipSize = Math.min(canvas.width, canvas.height)/8;
     ship.x=canvas.width/2; ship.y=canvas.height/2;
     bullets=[]; fires=[]; score=0; gameOver=false;
     for(let i=0;i<3;i++) spawnFire();
@@ -185,12 +196,9 @@ bind(document.getElementById("left"),"ArrowLeft");
 bind(document.getElementById("right"),"ArrowRight");
 bind(document.getElementById("shoot")," ");
 
-/* Mobile tap restart */
-canvas.addEventListener("touchstart", () => {
-    if(gameOver){
-        resetGame();
-    }
-});
+/* Restart anywhere */
+canvas.addEventListener("touchstart", () => { if(gameOver) resetGame(); });
+canvas.addEventListener("mousedown", () => { if(gameOver) resetGame(); });
 
 /* Game Loop */
 function gameLoop(){ update(); draw(); requestAnimationFrame(gameLoop); }
