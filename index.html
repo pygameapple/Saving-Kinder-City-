@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Mobile scaling fix -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fire Hydrant Rescue</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen">
+        <h1>🔥 Fire Hydrant Rescue 🔥</h1>
+        <p>Oh no! Fires are spreading across the city!<br>
+        Your mission: stop the fires with your trusty fire hydrant cannon.</p>
+        <p><strong>How to play:</strong></p>
+        <ul>
+            <li>PC: Arrow keys to move, SPACE to shoot water</li>
+            <li>Mobile: Tap arrows to move, 💧 button to spray water</li>
+        </ul>
+        <p>Press SPACE (or tap anywhere) to start!</p>
+    </div>
+
+    <h1 id="gameTitle">Fire Hydrant Rescue</h1>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Mobile Controls -->
+    <div id="mobileControls">
+      <div class="move">
+        <button id="up">↑</button>
+        <div style="display:flex; gap:10px;">
+          <button id="left">←</button>
+          <button id="down">↓</button>
+          <button id="right">→</button>
+        </div>
+      </div>
+
+      <div class="shoot">
+        <button id="shoot">💧</button>
+      </div>
+    </div>
+</body>
+</html>
