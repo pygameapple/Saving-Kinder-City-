@@ -9,6 +9,19 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+// Prevent double-tap zoom on mobile
+let lastTouch = 0;
+document.addEventListener('touchstart', function(e){
+    let now = (new Date()).getTime();
+    if(now - lastTouch <= 300){
+        e.preventDefault();
+    }
+    lastTouch = now;
+}, {passive:false});
+
+// Optional: prevent pinch zoom
+document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+
 let ship = { x: canvas.width/2, y: canvas.height/2, speed: 5 };
 let shootDir = {x:0, y:-1};
 let bullets = [];
