@@ -1,7 +1,13 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+
+// Resize canvas dynamically
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 let ship = { x: canvas.width/2, y: canvas.height/2, speed: 5 };
 let shootDir = {x:0, y:-1};
@@ -115,19 +121,25 @@ function checkCollisions(){
 
 /* Drawing */
 function drawBackground(){ ctx.fillStyle="#4CAF50"; ctx.fillRect(0,0,canvas.width,canvas.height); }
-function drawShip(){ ctx.drawImage(shipImg, ship.x-60, ship.y-60, 120, 120); }
+
+function drawShip(){
+    const scale = Math.min(canvas.width, canvas.height)/8;
+    ctx.drawImage(shipImg, ship.x - scale/2, ship.y - scale/2, scale, scale);
+}
 
 function draw(){
     drawBackground();
     drawShip();
 
     bullets.forEach(b=>{
+        const bulletSize = Math.min(canvas.width, canvas.height)/25;
         ctx.fillStyle="#00BFFF";
-        ctx.fillRect(b.x-5,b.y-15,10,30);
+        ctx.fillRect(b.x - bulletSize/2, b.y - bulletSize/2, bulletSize, bulletSize*3);
     });
 
     fires.forEach(f=>{
-        ctx.drawImage(fireImg,f.x-f.size,f.y-f.size,f.size*2,f.size*2);
+        const fireSize = f.size * Math.min(canvas.width, canvas.height)/800;
+        ctx.drawImage(fireImg, f.x - fireSize, f.y - fireSize, fireSize*2, fireSize*2);
     });
 
     ctx.fillStyle="white";
