@@ -9,17 +9,13 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Prevent double-tap zoom on mobile
+// Prevent double-tap and pinch zoom
 let lastTouch = 0;
 document.addEventListener('touchstart', function(e){
-    let now = (new Date()).getTime();
-    if(now - lastTouch <= 300){
-        e.preventDefault();
-    }
+    const now = (new Date()).getTime();
+    if(now - lastTouch <= 300) e.preventDefault();
     lastTouch = now;
 }, {passive:false});
-
-// Optional: prevent pinch zoom
 document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
 
 let ship = { x: canvas.width/2, y: canvas.height/2, speed: 5 };
@@ -45,7 +41,6 @@ function startGame(){
     startScreen.style.display = "none";
     gameStarted = true;
 }
-
 document.addEventListener("keydown", e => {
     keys[e.key] = true;
     if(!gameStarted && e.key===" ") startGame();
@@ -64,20 +59,22 @@ function spawnFire(size=60){
         dy: (Math.random()-0.5)*2
     });
 }
-
 for(let i=0;i<3;i++) spawnFire();
 let fireTimer=0;
 
 function update(){
     if(!gameStarted || gameOver) return;
 
+    const shipSize = Math.min(canvas.width, canvas.height)/8;
+
     if(keys["ArrowLeft"]){ ship.x-=ship.speed; shootDir={x:-1,y:0}; }
     if(keys["ArrowRight"]){ ship.x+=ship.speed; shootDir={x:1,y:0}; }
     if(keys["ArrowUp"]){ ship.y-=ship.speed; shootDir={x:0,y:-1}; }
     if(keys["ArrowDown"]){ ship.y+=ship.speed; shootDir={x:0,y:1}; }
 
-    ship.x = Math.max(60, Math.min(canvas.width-60, ship.x));
-    ship.y = Math.max(60, Math.min(canvas.height-60, ship.y));
+    // Keep ship inside canvas
+    ship.x = Math.max(Math.min(ship.x, canvas.width - shipSize/2), shipSize/2);
+    ship.y = Math.max(Math.min(ship.y, canvas.height - shipSize/2), shipSize/2);
 
     if(keys[" "]){
         bullets.push({ x:ship.x, y:ship.y, dx:shootDir.x*12, dy:shootDir.y*12 });
@@ -95,10 +92,10 @@ function update(){
         if(f.y<f.size || f.y>canvas.height-f.size) f.dy*=-1;
     });
 
-    checkCollisions();
+    checkCollisions(shipSize);
 }
 
-function checkCollisions(){
+function checkCollisions(shipSize){
     bullets.forEach((b,bi)=>{
         fires.forEach((f,fi)=>{
             let dx=b.x-f.x;
