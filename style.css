@@ -1,4 +1,3 @@
-/* Basic Styles */
 body {
     margin: 0;
     overflow: hidden;
@@ -7,14 +6,26 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    touch-action: manipulation;      /* prevent zoom gestures */
 }
 
+button {
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.35);
+    -webkit-tap-highlight-color: transparent; /* remove tap highlight */
+    outline: none;                            /* remove focus outline */
+    user-select: none;                         /* prevent text selection */
+}
+
+/* Canvas and game title */
 #gameCanvas {
     background: #4CAF50;
     display: block;
 }
-
-/* Title */
 #gameTitle {
     text-align: center;
     color: white;
@@ -28,58 +39,20 @@ body {
     position: fixed;
     bottom: 15px;
     width: 100%;
-    display: none;
+    display: flex;
     justify-content: space-between;
-    padding: 0 25px;
+    padding: 0 15px;
     box-sizing: border-box;
     z-index: 999;
 }
-
 #mobileControls .move{
     display:flex;
     flex-direction:column;
     gap:10px;
 }
-
 #mobileControls .shoot{
     display:flex;
     align-items:center;
-}
-
-#mobileControls button{
-    width:65px;
-    height:65px;
-    font-size:28px;
-    border-radius:50%;
-    border:none;
-    background:rgba(255,255,255,0.35);
-}
-
-/* show only on touch devices */
-@media (pointer: coarse){
-    #mobileControls{
-        display:flex;
-    }
-}
-
-/* Force landscape on phones */
-@media screen and (orientation: portrait) {
-    body::before{
-        content:"Rotate your phone to landscape to play";
-        position:fixed;
-        inset:0;
-        background:black;
-        color:white;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:28px;
-        text-align:center;
-        z-index:10000;
-    }
-    canvas{
-        display:none;
-    }
 }
 
 /* Start Screen */
@@ -96,22 +69,18 @@ body {
     padding: 20px;
     z-index: 10000;
 }
-
 #startScreen h1 {
     font-size: 48px;
     margin-bottom: 20px;
 }
-
 #startScreen p, #startScreen ul {
     font-size: 22px;
     margin: 10px 0;
 }
-
 #startScreen ul {
     list-style: none;
     padding: 0;
 }
-
 #startScreen ul li::before {
     content: "• ";
     color: yellow;
