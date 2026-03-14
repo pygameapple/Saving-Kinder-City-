@@ -1,7 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-/* ---------- PHONE-FIRST CANVAS ---------- */
+/* ---------- CANVAS SIZE (PHONE FIRST) ---------- */
 
 function resizeCanvas(){
     canvas.width = window.innerWidth;
@@ -25,19 +25,22 @@ document.addEventListener("touchstart", e=>{
 
 /* ---------- GAME CONSTANTS ---------- */
 
-const BORDER = 20; // thinner border
+const BORDER = 20;
 
 /* ---------- GAME STATE ---------- */
 
 let ship = {x:0,y:0,speed:6};
+
 let shootDir = {x:0,y:-1};
 
 let bullets = [];
 let fires = [];
+
 let keys = {};
 
 let score = 0;
 let highScore = 0;
+
 let gameOver = false;
 let gameStarted = false;
 
@@ -67,25 +70,25 @@ startScreen.addEventListener("mousedown",startGame);
 function spawnFire(size=65){
 
     let x,y;
-    const safe = 150;
+    const safe = 160;
 
     do{
-
         x = BORDER + Math.random()*(canvas.width-BORDER*2);
         y = BORDER + Math.random()*(canvas.height-BORDER*2);
-
     }
     while(Math.hypot(x-ship.x,y-ship.y) < safe);
 
     fires.push({
-        x,y,
-        size,
+        x:x,
+        y:y,
+        size:size,
         dx:(Math.random()-0.5)*2,
         dy:(Math.random()-0.5)*2
     });
+
 }
 
-/* ---------- RESET ---------- */
+/* ---------- RESET GAME ---------- */
 
 function resetGame(){
 
@@ -94,10 +97,14 @@ function resetGame(){
 
     bullets=[];
     fires=[];
+
     score=0;
     gameOver=false;
 
-    for(let i=0;i<3;i++) spawnFire();
+    for(let i=0;i<3;i++){
+        spawnFire();
+    }
+
 }
 
 /* ---------- CONTROLS ---------- */
@@ -110,8 +117,8 @@ document.addEventListener("keyup",e=>{
     keys[e.key]=false;
 });
 
-function press(k){ keys[k]=true; }
-function release(k){ keys[k]=false; }
+function press(k){keys[k]=true;}
+function release(k){keys[k]=false;}
 
 function bind(btn,key){
     btn.addEventListener("touchstart",()=>press(key));
@@ -139,128 +146,151 @@ let fireTimer = 0;
 
 function update(){
 
-    if(!gameStarted || gameOver) return;
+if(!gameStarted || gameOver) return;
 
-    const shipSize = Math.min(canvas.width,canvas.height)/7;
+const shipSize = Math.min(canvas.width,canvas.height)/7;
 
-    if(keys["ArrowLeft"]){ship.x-=ship.speed;shootDir={x:-1,y:0};}
-    if(keys["ArrowRight"]){ship.x+=ship.speed;shootDir={x:1,y:0};}
-    if(keys["ArrowUp"]){ship.y-=ship.speed;shootDir={x:0,y:-1};}
-    if(keys["ArrowDown"]){ship.y+=ship.speed;shootDir={x:0,y:1};}
+/* movement */
 
-    /* keep ship inside field */
+if(keys["ArrowLeft"]){ship.x-=ship.speed;shootDir={x:-1,y:0};}
+if(keys["ArrowRight"]){ship.x+=ship.speed;shootDir={x:1,y:0};}
+if(keys["ArrowUp"]){ship.y-=ship.speed;shootDir={x:0,y:-1};}
+if(keys["ArrowDown"]){ship.y+=ship.speed;shootDir={x:0,y:1};}
 
-    ship.x = Math.max(
-        BORDER+shipSize/2,
-        Math.min(canvas.width-BORDER-shipSize/2,ship.x)
-    );
+/* keep ship inside */
 
-    ship.y = Math.max(
-        BORDER+shipSize/2,
-        Math.min(canvas.height-BORDER-shipSize/2,ship.y)
-    );
+ship.x = Math.max(
+    BORDER+shipSize/2,
+    Math.min(canvas.width-BORDER-shipSize/2,ship.x)
+);
 
-    /* shoot */
+ship.y = Math.max(
+    BORDER+shipSize/2,
+    Math.min(canvas.height-BORDER-shipSize/2,ship.y)
+);
 
-    if(keys[" "]){
-        bullets.push({
-            x:ship.x,
-            y:ship.y,
-            dx:shootDir.x*14,
-            dy:shootDir.y*14
-        });
-        keys[" "]=false;
+/* shooting */
+
+if(keys[" "]){
+    bullets.push({
+        x:ship.x,
+        y:ship.y,
+        dx:shootDir.x*14,
+        dy:shootDir.y*14
+    });
+    keys[" "]=false;
+}
+
+/* move bullets */
+
+bullets.forEach(b=>{
+    b.x+=b.dx;
+    b.y+=b.dy;
+});
+
+/* spawn fires gradually */
+
+fireTimer++;
+
+if(fireTimer>90){
+    spawnFire();
+    fireTimer=0;
+}
+
+/* move fires smoothly */
+
+fires.forEach(f=>{
+
+    f.x += f.dx;
+    f.y += f.dy;
+
+    if(f.x < BORDER + f.size){
+        f.x = BORDER + f.size;
+        f.dx *= -1;
     }
 
-    bullets.forEach(b=>{
-        b.x+=b.dx;
-        b.y+=b.dy;
-    });
-
-    /* spawn fires */
-
-    fireTimer++;
-
-    if(fireTimer>100){
-        spawnFire();
-        fireTimer=0;
+    if(f.x > canvas.width - BORDER - f.size){
+        f.x = canvas.width - BORDER - f.size;
+        f.dx *= -1;
     }
 
-    /* move fires */
+    if(f.y < BORDER + f.size){
+        f.y = BORDER + f.size;
+        f.dy *= -1;
+    }
 
-    fires.forEach(f=>{
+    if(f.y > canvas.height - BORDER - f.size){
+        f.y = canvas.height - BORDER - f.size;
+        f.dy *= -1;
+    }
 
-        f.x+=f.dx;
-        f.y+=f.dy;
+});
 
-        if(f.x < BORDER+f.size || f.x > canvas.width-BORDER-f.size) f.dx*=-1;
-        if(f.y < BORDER+f.size || f.y > canvas.height-BORDER-f.size) f.dy*=-1;
+checkCollisions();
 
-    });
-
-    checkCollisions();
 }
 
 /* ---------- COLLISIONS ---------- */
 
 function checkCollisions(){
 
-    bullets.forEach((b,bi)=>{
+bullets.forEach((b,bi)=>{
 
-        fires.forEach((f,fi)=>{
+fires.forEach((f,fi)=>{
 
-            if(Math.hypot(b.x-f.x,b.y-f.y)<f.size){
+if(Math.hypot(b.x-f.x,b.y-f.y)<f.size){
 
-                score+=10;
-                bullets.splice(bi,1);
+score+=10;
 
-                if(f.size>35){
+bullets.splice(bi,1);
 
-                    for(let i=0;i<2;i++){
+if(f.size>35){
 
-                        fires.push({
-                            x:f.x,
-                            y:f.y,
-                            size:f.size/2,
-                            dx:(Math.random()-0.5)*3,
-                            dy:(Math.random()-0.5)*3
-                        });
+for(let i=0;i<2;i++){
 
-                    }
-
-                }
-
-                fires.splice(fi,1);
-
-            }
-
-        });
-
-    });
-
-    fires.forEach(f=>{
-        if(Math.hypot(ship.x-f.x,ship.y-f.y)<f.size){
-            gameOver=true;
-            if(score>highScore) highScore=score;
-        }
-    });
+fires.push({
+x:f.x,
+y:f.y,
+size:f.size/2,
+dx:(Math.random()-0.5)*3,
+dy:(Math.random()-0.5)*3
+});
 
 }
 
-/* ---------- DRAW BACKGROUND ---------- */
+}
+
+fires.splice(fi,1);
+
+}
+
+});
+
+});
+
+fires.forEach(f=>{
+if(Math.hypot(ship.x-f.x,ship.y-f.y)<f.size){
+gameOver=true;
+if(score>highScore) highScore=score;
+}
+});
+
+}
+
+/* ---------- BACKGROUND ---------- */
 
 function drawBackground(){
 
-    ctx.fillStyle="#2E7D32";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#2E7D32";
+ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    ctx.fillStyle="#4CAF50";
-    ctx.fillRect(
-        BORDER,
-        BORDER,
-        canvas.width-BORDER*2,
-        canvas.height-BORDER*2
-    );
+ctx.fillStyle="#4CAF50";
+ctx.fillRect(
+BORDER,
+BORDER,
+canvas.width-BORDER*2,
+canvas.height-BORDER*2
+);
 
 }
 
@@ -268,64 +298,72 @@ function drawBackground(){
 
 function draw(){
 
-    drawBackground();
+drawBackground();
 
-    const shipSize=Math.min(canvas.width,canvas.height)/7;
+const shipSize=Math.min(canvas.width,canvas.height)/7;
 
-    ctx.drawImage(
-        shipImg,
-        ship.x-shipSize/2,
-        ship.y-shipSize/2,
-        shipSize,
-        shipSize
-    );
+ctx.drawImage(
+shipImg,
+ship.x-shipSize/2,
+ship.y-shipSize/2,
+shipSize,
+shipSize
+);
 
-    bullets.forEach(b=>{
-        ctx.fillStyle="#00BFFF";
-        ctx.fillRect(b.x-5,b.y-10,10,20);
-    });
+/* water bullets */
 
-    fires.forEach(f=>{
-        ctx.drawImage(
-            fireImg,
-            f.x-f.size,
-            f.y-f.size,
-            f.size*2,
-            f.size*2
-        );
-    });
+bullets.forEach(b=>{
+ctx.fillStyle="#00BFFF";
+ctx.fillRect(b.x-6,b.y-10,12,20);
+});
 
-    ctx.fillStyle="white";
-    ctx.font="20px monospace";
-    ctx.fillText("Score: "+score,20,35);
-    ctx.fillText("Highscore: "+highScore,20,60);
+/* fires */
 
-    if(gameOver){
+fires.forEach(f=>{
+ctx.drawImage(
+fireImg,
+f.x-f.size,
+f.y-f.size,
+f.size*2,
+f.size*2
+);
+});
 
-        ctx.font="42px monospace";
-        ctx.fillText(
-            "GAME OVER",
-            canvas.width/2-120,
-            canvas.height/2
-        );
+/* score */
 
-        ctx.font="20px monospace";
-        ctx.fillText(
-            "Tap or click to restart",
-            canvas.width/2-110,
-            canvas.height/2+35
-        );
+ctx.fillStyle="white";
+ctx.font="20px monospace";
+ctx.fillText("Score: "+score,20,35);
+ctx.fillText("Highscore: "+highScore,20,60);
 
-    }
+/* game over */
+
+if(gameOver){
+
+ctx.font="42px monospace";
+ctx.fillText(
+"GAME OVER",
+canvas.width/2-120,
+canvas.height/2
+);
+
+ctx.font="20px monospace";
+ctx.fillText(
+"Tap or click to restart",
+canvas.width/2-110,
+canvas.height/2+35
+);
+
+}
 
 }
 
 /* ---------- GAME LOOP ---------- */
 
 function loop(){
-    update();
-    draw();
-    requestAnimationFrame(loop);
+update();
+draw();
+requestAnimationFrame(loop);
 }
 
 loop();
