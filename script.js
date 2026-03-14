@@ -1,7 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-/* ---------- CANVAS SIZE ---------- */
+/* ---------- PHONE-FIRST CANVAS ---------- */
 
 function resizeCanvas(){
     canvas.width = window.innerWidth;
@@ -25,7 +25,7 @@ document.addEventListener("touchstart", e=>{
 
 /* ---------- GAME CONSTANTS ---------- */
 
-const BORDER = 40;
+const BORDER = 20; // thinner border
 
 /* ---------- GAME STATE ---------- */
 
@@ -64,10 +64,10 @@ startScreen.addEventListener("mousedown",startGame);
 
 /* ---------- SPAWN FIRE ---------- */
 
-function spawnFire(size=70){
+function spawnFire(size=65){
 
     let x,y;
-    const safe = 180;
+    const safe = 150;
 
     do{
 
@@ -296,24 +296,24 @@ function draw(){
     });
 
     ctx.fillStyle="white";
-    ctx.font="22px monospace";
-    ctx.fillText("Score: "+score,20,40);
-    ctx.fillText("Highscore: "+highScore,20,70);
+    ctx.font="20px monospace";
+    ctx.fillText("Score: "+score,20,35);
+    ctx.fillText("Highscore: "+highScore,20,60);
 
     if(gameOver){
 
-        ctx.font="48px monospace";
+        ctx.font="42px monospace";
         ctx.fillText(
             "GAME OVER",
-            canvas.width/2-140,
+            canvas.width/2-120,
             canvas.height/2
         );
 
-        ctx.font="22px monospace";
+        ctx.font="20px monospace";
         ctx.fillText(
-            "Tap or click anywhere to restart",
-            canvas.width/2-150,
-            canvas.height/2+40
+            "Tap or click to restart",
+            canvas.width/2-110,
+            canvas.height/2+35
         );
 
     }
