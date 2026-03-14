@@ -1,87 +1,100 @@
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: monospace;
-    background: #4CAF50;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    touch-action: manipulation;      /* prevent zoom gestures */
+body{
+
+margin:0;
+overflow:hidden;
+
+background:#1b5e20;
+
+font-family:monospace;
+
+touch-action:none;
+
 }
 
-button {
-    width: 50px;
-    height: 50px;
-    font-size: 22px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.35);
-    -webkit-tap-highlight-color: transparent; /* remove tap highlight */
-    outline: none;                            /* remove focus outline */
-    user-select: none;                         /* prevent text selection */
+canvas{
+
+display:block;
+
 }
 
-/* Canvas and game title */
-#gameCanvas {
-    background: #4CAF50;
-    display: block;
-}
-#gameTitle {
-    text-align: center;
-    color: white;
-    font-size: 48px;
-    font-family: monospace;
-    margin: 10px 0;
+/* start screen */
+
+#startScreen{
+
+position:absolute;
+
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.8);
+
+color:white;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+text-align:center;
+
 }
 
-/* Mobile Controls */
-#mobileControls{
-    position: fixed;
-    bottom: 15px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 15px;
-    box-sizing: border-box;
-    z-index: 999;
-}
-#mobileControls .move{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-#mobileControls .shoot{
-    display:flex;
-    align-items:center;
+/* controls */
+
+.control{
+
+position:fixed;
+
+width:70px;
+height:70px;
+
+font-size:28px;
+
+border:none;
+border-radius:12px;
+
+background:white;
+
 }
 
-/* Start Screen */
-#startScreen {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(to bottom, #4CAF50, #2E7D32);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    z-index: 10000;
+/* corners */
+
+.up{
+bottom:140px;
+left:80px;
 }
-#startScreen h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
+
+.left{
+bottom:70px;
+left:10px;
 }
-#startScreen p, #startScreen ul {
-    font-size: 22px;
-    margin: 10px 0;
+
+.right{
+bottom:70px;
+left:150px;
 }
-#startScreen ul {
-    list-style: none;
-    padding: 0;
+
+.down{
+bottom:10px;
+left:80px;
 }
-#startScreen ul li::before {
-    content: "• ";
-    color: yellow;
+
+.shoot{
+
+bottom:70px;
+right:30px;
+
+font-size:30px;
+
+}
+
+.control:active{
+
+background:#ddd;
+
 }

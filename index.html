@@ -1,44 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <!-- Mobile scaling fix -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fire Hydrant Rescue</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>Fire Hydrant Rescue</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
+
 <body>
-    <!-- Start Screen -->
-    <div id="startScreen">
-        <h1>🔥 Fire Hydrant Rescue 🔥</h1>
-        <p>Oh no! Fires are spreading across the city!<br>
-        Your mission: stop the fires with your trusty fire hydrant cannon.</p>
-        <p><strong>How to play:</strong></p>
-        <ul>
-            <li>PC: Arrow keys to move, SPACE to shoot water</li>
-            <li>Mobile: Tap arrows to move, 💧 button to spray water</li>
-        </ul>
-        <p>Press SPACE (or tap anywhere) to start!</p>
-    </div>
 
-    <h1 id="gameTitle">Fire Hydrant Rescue</h1>
-    <canvas id="gameCanvas"></canvas>
+<canvas id="gameCanvas"></canvas>
 
-    <!-- Mobile Controls -->
-    <div id="mobileControls">
-      <div class="move">
-        <button id="up">↑</button>
-        <div style="display:flex; gap:10px;">
-          <button id="left">←</button>
-          <button id="down">↓</button>
-          <button id="right">→</button>
-        </div>
-      </div>
+<div id="startScreen">
+<h1>🔥 Fire Hydrant Rescue 🔥</h1>
+<p>Stop the spreading fires!</p>
+<p>Move with arrows</p>
+<p>Shoot water with SPACE or 💧</p>
+<p>Tap anywhere to begin</p>
+</div>
 
-      <div class="shoot">
-        <button id="shoot">💧</button>
-      </div>
-    </div>
+<!-- MOBILE CONTROLS -->
+
+<button id="up" class="control up">↑</button>
+<button id="left" class="control left">←</button>
+<button id="right" class="control right">→</button>
+<button id="down" class="control down">↓</button>
+<button id="shoot" class="control shoot">💧</button>
+
+<script src="script.js"></script>
+
 </body>
 </html>
