@@ -1,7 +1,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-/* ---------- PHONE FRIENDLY CANVAS ---------- */
+/* ---------- CANVAS SIZE ---------- */
 
 function resizeCanvas(){
     canvas.width = window.innerWidth;
@@ -12,9 +12,9 @@ window.addEventListener("resize", resizeCanvas);
 
 /* ---------- STOP PHONE ZOOM ---------- */
 
-document.addEventListener("touchmove", e => {
-    if(e.scale !== 1){ e.preventDefault(); }
-},{ passive:false });
+document.addEventListener("touchmove", e=>{
+    if(e.scale !== 1) e.preventDefault();
+},{passive:false});
 
 let lastTouch = 0;
 document.addEventListener("touchstart", e=>{
@@ -22,6 +22,10 @@ document.addEventListener("touchstart", e=>{
     if(now-lastTouch < 300) e.preventDefault();
     lastTouch = now;
 },{passive:false});
+
+/* ---------- GAME CONSTANTS ---------- */
+
+const BORDER = 40;
 
 /* ---------- GAME STATE ---------- */
 
@@ -40,10 +44,10 @@ let gameStarted = false;
 /* ---------- IMAGES ---------- */
 
 const fireImg = new Image();
-fireImg.src="images/asteroid.png";
+fireImg.src = "images/asteroid.png";
 
 const shipImg = new Image();
-shipImg.src="images/ship.png";
+shipImg.src = "images/ship.png";
 
 /* ---------- START SCREEN ---------- */
 
@@ -58,7 +62,7 @@ function startGame(){
 startScreen.addEventListener("touchstart",startGame);
 startScreen.addEventListener("mousedown",startGame);
 
-/* ---------- FIRE SPAWNING ---------- */
+/* ---------- SPAWN FIRE ---------- */
 
 function spawnFire(size=70){
 
@@ -66,8 +70,10 @@ function spawnFire(size=70){
     const safe = 180;
 
     do{
-        x = Math.random()*canvas.width;
-        y = Math.random()*canvas.height;
+
+        x = BORDER + Math.random()*(canvas.width-BORDER*2);
+        y = BORDER + Math.random()*(canvas.height-BORDER*2);
+
     }
     while(Math.hypot(x-ship.x,y-ship.y) < safe);
 
@@ -79,7 +85,7 @@ function spawnFire(size=70){
     });
 }
 
-/* ---------- RESET GAME ---------- */
+/* ---------- RESET ---------- */
 
 function resetGame(){
 
@@ -96,6 +102,14 @@ function resetGame(){
 
 /* ---------- CONTROLS ---------- */
 
+document.addEventListener("keydown",e=>{
+    keys[e.key]=true;
+});
+
+document.addEventListener("keyup",e=>{
+    keys[e.key]=false;
+});
+
 function press(k){ keys[k]=true; }
 function release(k){ keys[k]=false; }
 
@@ -110,7 +124,7 @@ bind(document.getElementById("left"),"ArrowLeft");
 bind(document.getElementById("right"),"ArrowRight");
 bind(document.getElementById("shoot")," ");
 
-/* ---------- RESTART ANYWHERE ---------- */
+/* ---------- RESTART ---------- */
 
 canvas.addEventListener("touchstart",()=>{
     if(gameOver) resetGame();
@@ -121,7 +135,7 @@ canvas.addEventListener("mousedown",()=>{
 
 /* ---------- UPDATE ---------- */
 
-let fireTimer=0;
+let fireTimer = 0;
 
 function update(){
 
@@ -134,11 +148,20 @@ function update(){
     if(keys["ArrowUp"]){ship.y-=ship.speed;shootDir={x:0,y:-1};}
     if(keys["ArrowDown"]){ship.y+=ship.speed;shootDir={x:0,y:1};}
 
-    /* stay on screen */
-    ship.x=Math.max(shipSize/2,Math.min(canvas.width-shipSize/2,ship.x));
-    ship.y=Math.max(shipSize/2,Math.min(canvas.height-shipSize/2,ship.y));
+    /* keep ship inside field */
+
+    ship.x = Math.max(
+        BORDER+shipSize/2,
+        Math.min(canvas.width-BORDER-shipSize/2,ship.x)
+    );
+
+    ship.y = Math.max(
+        BORDER+shipSize/2,
+        Math.min(canvas.height-BORDER-shipSize/2,ship.y)
+    );
 
     /* shoot */
+
     if(keys[" "]){
         bullets.push({
             x:ship.x,
@@ -154,19 +177,25 @@ function update(){
         b.y+=b.dy;
     });
 
-    /* spawn fires faster */
+    /* spawn fires */
+
     fireTimer++;
+
     if(fireTimer>100){
         spawnFire();
         fireTimer=0;
     }
 
+    /* move fires */
+
     fires.forEach(f=>{
+
         f.x+=f.dx;
         f.y+=f.dy;
 
-        if(f.x<f.size||f.x>canvas.width-f.size) f.dx*=-1;
-        if(f.y<f.size||f.y>canvas.height-f.size) f.dy*=-1;
+        if(f.x < BORDER+f.size || f.x > canvas.width-BORDER-f.size) f.dx*=-1;
+        if(f.y < BORDER+f.size || f.y > canvas.height-BORDER-f.size) f.dy*=-1;
+
     });
 
     checkCollisions();
@@ -188,6 +217,7 @@ function checkCollisions(){
                 if(f.size>35){
 
                     for(let i=0;i<2;i++){
+
                         fires.push({
                             x:f.x,
                             y:f.y,
@@ -195,6 +225,7 @@ function checkCollisions(){
                             dx:(Math.random()-0.5)*3,
                             dy:(Math.random()-0.5)*3
                         });
+
                     }
 
                 }
@@ -216,12 +247,28 @@ function checkCollisions(){
 
 }
 
+/* ---------- DRAW BACKGROUND ---------- */
+
+function drawBackground(){
+
+    ctx.fillStyle="#2E7D32";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#4CAF50";
+    ctx.fillRect(
+        BORDER,
+        BORDER,
+        canvas.width-BORDER*2,
+        canvas.height-BORDER*2
+    );
+
+}
+
 /* ---------- DRAW ---------- */
 
 function draw(){
 
-    ctx.fillStyle="#4CAF50";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    drawBackground();
 
     const shipSize=Math.min(canvas.width,canvas.height)/7;
 
@@ -264,8 +311,8 @@ function draw(){
 
         ctx.font="22px monospace";
         ctx.fillText(
-            "Tap anywhere to restart",
-            canvas.width/2-140,
+            "Tap or click anywhere to restart",
+            canvas.width/2-150,
             canvas.height/2+40
         );
 
