@@ -29,7 +29,7 @@ let started = false
 let keys = {}
 
 /* TRACK LAST DIRECTION */
-let lastDir = {x:0, y:-1} // initially facing up
+let lastDir = {x:0, y:-1}
 
 /* BUTTONS */
 const up = document.getElementById("up")
@@ -110,7 +110,7 @@ let fireTimer = 0
 function update(){
     if(!started || gameOver) return
 
-    const shipSize = Math.min(canvas.width, canvas.height)/5
+    const shipSize = Math.min(canvas.width, canvas.height)/3
 
     /* MOVEMENT + LAST DIRECTION */
     if(keys["ArrowLeft"]){
@@ -133,7 +133,7 @@ function update(){
     ship.x = Math.max(BORDER+shipSize/2, Math.min(canvas.width-BORDER-shipSize/2, ship.x))
     ship.y = Math.max(BORDER+shipSize/2, Math.min(canvas.height-BORDER-shipSize/2, ship.y))
 
-    /* SHOOTING IN SAME DIRECTION AS SHIP */
+    /* SHOOTING (same direction as facing) */
     if(keys[" "]){
         bullets.push({
             x: ship.x,
@@ -231,9 +231,9 @@ function drawBackground(){
 /* DRAW */
 function draw(){
     drawBackground()
-    const shipSize = Math.min(canvas.width, canvas.height)/5
 
-    /* SELECT SHIP IMAGE BASED ON LAST DIRECTION */
+    const shipSize = Math.min(canvas.width, canvas.height)/3
+
     let currentShip = shipUpDown
     if(lastDir.x === -1) currentShip = shipLeft
     else if(lastDir.x === 1) currentShip = shipRight
@@ -247,13 +247,11 @@ function draw(){
         shipSize
     )
 
-    /* BULLETS */
     bullets.forEach(b=>{
         ctx.fillStyle="#00BFFF"
         ctx.fillRect(b.x-6, b.y-10, 12, 20)
     })
 
-    /* FIRES */
     fires.forEach(f=>{
         ctx.drawImage(
             fireImg,
